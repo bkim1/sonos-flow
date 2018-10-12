@@ -1,2 +1,5 @@
 .vscode
 
+# Virtual Environments
+flo-env
+venv
