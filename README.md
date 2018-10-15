@@ -6,6 +6,8 @@ Sonos Flo is a project created for the Sonos Challenge: Boston hackathon.
 
 Authors: Branden Kim, Brian Hempe, Caroline Downey, Fin Elliot, Victoria Napolitano
 
+Codebase: Python 3.7
+
 ---
 
 
@@ -20,13 +22,22 @@ Authors: Branden Kim, Brian Hempe, Caroline Downey, Fin Elliot, Victoria Napolit
 6. Congrats! The project is now ready to be run
 
 
-## Running the project
+## Running the project as a developer
 
 ### For First Time Only
 
-1. Run `export FLASK_APP=flo` and `export FLASK_ENV=development`
+1. Run `export FLASK_APP=app` and `export FLASK_ENV=development`
 
 ### Otherwise
 
 1. Run `flask run`
 2. The server will start and be up on port 5000
+
+
+## Running the project for production
+1. Run `gunicorn -b :5000 --access-logfile - --error-logfile - flo:app`
+
+## To deploy the server using Zeit Now
+1. Run `./deploy.sh`
+
+Note: This project is deploying a docker image, so if you want to deploy the project, you must have Docker installed.
