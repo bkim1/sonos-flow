@@ -19,3 +19,14 @@ Authors: Branden Kim, Brian Hempe, Caroline Downey, Fin Elliot, Victoria Napolit
 5. Install all dependencies using `pip install -r requirements.txt`
 6. Congrats! The project is now ready to be run
 
+
+## Running the project
+
+### For First Time Only
+
+1. Run `export FLASK_APP=flo` and `export FLASK_ENV=development`
+
+### Otherwise
+
+1. Run `flask run`
+2. The server will start and be up on port 5000
