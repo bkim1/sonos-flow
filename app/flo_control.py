@@ -2,7 +2,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
 
-bp = Blueprint('flo_control', __name__)
+bp = Blueprint('flo_control', __name__, url_prefix='/flo')
 
 #add routes for Oauth
 #logic for communicating with RBpi
@@ -13,3 +13,14 @@ bp = Blueprint('flo_control', __name__)
 #when it is INRANGE of client device. When it sends out signal, it does NOT know if the other RBPI
 #No logic connecting one raspberry pi to another
 #assumption based off the fact that we are having the RBPIs placed far enough away from each other
+
+@bp.route('/enter', methods=['POST'])
+def enter_flo():
+    """ Endpoint for when the user enters into the range of the speaker """
+    return 'Entering flo!'
+
+
+@bp.route('/exit', methods=['POST'])
+def exit_flo():
+    """ Endpoint for when the user exits the range of the speaker """
+    return 'Exiting flo!'

@@ -25,8 +25,14 @@ def create_app(test_config=None):
         pass
 
     # a simple page that says hello
-    @app.route('/hello')
+    @app.route('/')
     def hello():
         return 'Hello, World!'
+
+    # register the other blueprints to the app
+    from app import auth, flo_control
+    app.register_blueprint(auth.bp)
+    app.register_blueprint(flo_control.bp)
+
 
     return app
