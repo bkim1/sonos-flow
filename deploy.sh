@@ -1,3 +1,3 @@
 #!/bin/sh
-docker build -t flo:latest .
+docker build -t flow:latest .
 now --public && now alias
