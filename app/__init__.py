@@ -8,7 +8,7 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'flo.sqlite'),
+        DATABASE=os.path.join(app.instance_path, 'flow.sqlite'),
     )
 
     if test_config is None:
@@ -24,15 +24,21 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    # load env variables
+    from dotenv import load_dotenv
+    from pathlib import Path  # python3 only
+    env_path = Path('.') / 'vars.env'
+    load_dotenv(dotenv_path=env_path)
+    
     # a simple page that says hello
     @app.route('/')
     def hello():
         return 'Hello, World!'
 
     # register the other blueprints to the app
-    from app import auth, flo_control
+    from app import auth, flow_control
     app.register_blueprint(auth.bp)
-    app.register_blueprint(flo_control.bp)
+    app.register_blueprint(flow_control.bp)
 
 
     return app
