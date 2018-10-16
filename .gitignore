@@ -1,4 +1,6 @@
+# Random Stuff
 .vscode
+.DS_Store
 
 # Virtual Environments
 venv/
@@ -18,5 +20,8 @@ dist/
 build/
 *.egg-info/
 
-
+# Environment Variables
 vars.env
+.env
+
+

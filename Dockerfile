@@ -10,8 +10,7 @@ RUN venv/bin/pip install -r requirements.txt
 RUN venv/bin/pip install gunicorn
 
 COPY app app
-COPY flo.py boot.sh ./
-COPY vars.env ./
+COPY flow.py boot.sh ./
 RUN chmod +x boot.sh
 
 ENV FLASK_APP flow.py

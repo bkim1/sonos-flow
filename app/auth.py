@@ -20,6 +20,10 @@ TOKEN_REDIRECT_URI = parse.quote('https://sonos-flo.now.sh/auth/token-redirect',
 TOKEN_LOCAL_REDIRECT_URI = parse.quote('http://localhost:5000/auth/token-redirect', safe='')
 
 
+# CLIENT_KEY = '89ca5e88-d049-42ad-9f13-3bbc839659f7'
+# CLIENT_SECRET = 'f6d51a2a-7098-41aa-ad69-ba5ff024204c'
+
+
 @bp.route('/login', defaults={'local': 0})
 @bp.route('/login/<int:local>', methods=['GET'])
 def authenticate(local):
@@ -46,31 +50,28 @@ def handle_login_redirect(local):
 
     client_key, secret_key = os.getenv('CLIENT_KEY'), os.getenv('CLIENT_SECRET')
 
-    # Base64 Encode ClientKey:SecretKey
+    # Base64 Encode 'ClientKey:SecretKey'
     key_pair = f'{client_key}:{secret_key}'
     encoded_keys = base64.b64encode(bytes(key_pair, 'utf-8'))
-    print(encoded_keys)
+    encoded_keys_str = encoded_keys.decode('utf-8')
 
     redirect_uri = LOGIN_LOCAL_REDIRECT_URI if local else LOGIN_REDIRECT_URI
 
     # Set Headers & Data for request
     auth_url = f'{SONOS_AUTH_URL}/access'
-    headers = { 'Authorization': 'Basic %s' % encoded_keys }
+    headers = {
+        "Authorization": 'Basic %s' % encoded_keys_str,
+        # 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+    }
     print(headers)
-    data = {
+    payload = {
         'grant_type': 'authorization_code',
         'code': auth_code,
         'redirect_uri': redirect_uri
     }
 
     # Make POST request for Access Token
-    resp = requests.post(auth_url, json=data, headers=headers)
+    resp = requests.post(auth_url, data=payload, headers=headers)
     print(f'Data: {resp.json()}')
     print(f'Status Code: {resp.status_code}')
     return 'Received Login Redirect!'
-
-
-@bp.route('/token-redirect', methods=['GET'])
-def handle_token_redirect():
-    
-    return 'Received Token Redirect!'
