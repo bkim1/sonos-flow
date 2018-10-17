@@ -10,7 +10,7 @@ This repository holds one component of Sonos Flow. It is a Flask web server that
 
 Authors: Branden Kim, Brian Hempe, Caroline Downey, Fin Elliot, Victoria Napolitano
 
-Codebase: Python 3.7
+Sonos Flow runs on Python 3.7 and Flask 1.0.2. It is being deployed using ZEIT's Now service with a Docker container. The deployed version runs on a gunicorn server.
 
 ---
 
