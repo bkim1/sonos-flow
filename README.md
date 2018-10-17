@@ -1,6 +1,10 @@
-# Sonos Flo
+# Sonos Flow
 
-Sonos Flo is a project created for the Sonos Challenge: Boston hackathon.
+Sonos Flow is a project created for the Sonos Challenge: Boston hackathon. It allows the user to have sound follow them throughout their home.
+
+Sonos Flow is compatible with Sonos.
+
+This repository holds one component of Sonos Flow. It is a Flask web server that interacts with the Sonos API to control the speakers within a household.
 
 ---
 
@@ -41,3 +45,44 @@ Codebase: Python 3.7
 1. Run `./deploy.sh`
 
 Note: This project is deploying a docker image, so if you want to deploy the project, you must have Docker installed.
+
+
+# API Documentation
+
+Below is a description of the available endpoints
+
+---
+
+## **Authentication**
+
+### **Login & Authorize Sonos Flow**
+#### `GET`: `/auth/login`
+
+Redirects the browser to Sonos's login page to authorize Sonos Flow to access the household. 
+
+--- 
+
+## **Flow Control**
+
+### **Setup Flow for Household**
+#### `GET`: `/flow`
+
+Sets up the server to handle the household. Have to authorize Sonos Flow prior to calling this endpoint.
+
+Sets up:
+* Household
+* Groups within household
+* Favorites for household
+
+
+### **Enter Flow**
+#### `GET`: `/flow/enter/<string:group>`
+#### `GET`: `/flow/enter/<string:group>/<string:favorite>`
+
+Starts playing content for the specified group. The group and favorite parameter should be the name of the group or favorite within the household. 
+
+
+### **Exit Flow**
+#### `GET`: `/flow/exit/<string:group>`
+
+Stops playing content for the specified group. The group parameter should be the name of the group within the household.
