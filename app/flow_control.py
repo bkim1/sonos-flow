@@ -82,17 +82,30 @@ def get_favorites():
 
 
 @bp.route('/enter/<string:group>', methods=['GET', 'POST'],
-          defaults={ 'favorite': 'New Shit'})
+          defaults={ 'favorite': None})
 @bp.route('/enter/<string:group>/<string:favorite>', methods=['GET', 'POST'])
 def enter_flow(group, favorite):
     """ Endpoint for when the user enters into the range of the speaker """
+    fav_provided = True
     try: 
         household_id = os.getenv('HouseholdID')
         group_id = GROUP_IDS[group]
+        
+        if favorite is None:
+            favorite = 'New Shit'
+            fav_provided = False
+
         favorite_id = FAVORITES[favorite]
     except KeyError:
         return 'Need to setup the flow first!'
     else:
+        if not fav_provided:
+            # Attempt to play something already queued
+            data, code = SONOS_API.post(f'groups/{group_id}/playback/play')
+            if code >= 200 or code < 300:
+                return 'Entered flow!'
+
+        # Else, play favorites
         payload = {
             'favoriteId': favorite_id,
             'playOnCompletion': True,
