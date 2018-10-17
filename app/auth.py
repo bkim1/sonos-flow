@@ -53,7 +53,7 @@ def handle_login_redirect(local):
             local: int specifying whether the redirect should go to localhost
                    or the deployed instance 
     """
-    if STATE != request.args['state']:
+    if os.getenv('STATE') != request.args['state']:
         return 'Invalid Redirect... Wrong State'
 
     auth_code = request.args['code']
