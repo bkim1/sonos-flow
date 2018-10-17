@@ -77,9 +77,9 @@ def get_favorites():
 def enter_flow(group, favorite):
     """ Endpoint for when the user enters into the range of the speaker.
         
-        Resumes whatever is paused on the speakers if a favorite is not
-        specified or picks a random favorite to play. Otherwise, plays the
-        favorite for the group specified.
+        If a favorite is not specified, then it attempts to resume whatever is
+        paused or picks a random favorite to play if nothing was paused.
+        Otherwise, plays the favorite for the group specified.
 
         Args:
             group: string representing the name of the group in the household
@@ -95,8 +95,7 @@ def enter_flow(group, favorite):
         if favorite is None:
             favorite = random.choice(list(FAVORITES))
             fav_provided = False
-        else:
-            favorite_id = FAVORITES[favorite]
+        favorite_id = FAVORITES[favorite]
     except KeyError:
         return 'Need to setup the flow first!'
     else:
