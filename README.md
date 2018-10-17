@@ -51,6 +51,8 @@ Note: This project is deploying a docker image, so if you want to deploy the pro
 
 Below is a description of the available endpoints
 
+Base URL: `https://sonos-flow.now.sh`
+
 ---
 
 ## **Authentication**
@@ -63,6 +65,8 @@ Redirects the browser to Sonos's login page to authorize Sonos Flow to access th
 --- 
 
 ## **Flow Control**
+
+To use any of these endpoints, you MUST authenticate first. Then, setup Flow for the household by accessing the `/flow` endpoint.
 
 ### **Setup Flow for Household**
 #### `GET`: `/flow`
