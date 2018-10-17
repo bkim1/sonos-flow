@@ -1,4 +1,8 @@
 {
     "name": "sonos-flow",
-    "alias": "sonos-flow.now.sh"
+    "alias": "sonos-flow.now.sh",
+    "env": {
+        "CLIENT_KEY": "@flow-client-key",
+        "CLIENT_SECRET": "@flow-client-secret"
+    }
 }
