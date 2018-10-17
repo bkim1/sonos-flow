@@ -1,4 +1,5 @@
 import os
+import random
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
@@ -13,29 +14,20 @@ GROUP_IDS = {}
 PLAYER_IDS = {}
 FAVORITES = {}
 
-#add routes for Oauth
-#logic for communicating with RBpi
-#write for raspberry pi communicating to the server. Needs to call the webserver when, and only when,
-#it's INRANGE. Make another call when the RBPI is OUTOFRANGE
-#'hard-code' for when we're INRANGE of RBPI1, start play 'MR BRIGHT..', when OUTOFRANGE, stop
-#RBPI is ONLY going to be communicating to the webserver. RBPI acting as a SWITCH to send out signal
-#when it is INRANGE of client device. When it sends out signal, it does NOT know if the other RBPI
-#No logic connecting one raspberry pi to another
-#assumption based off the fact that we are having the RBPIs placed far enough away from each other
-
 
 @bp.route('/')
 def setup_flow():
+    """ Sets up the server to handle Flow control for the Sonos household
+        authorized. Grabs the groups and favorites for the first household.
+    """
     if not SONOS_API.set_tokens():
         return 'Please authorize first to get the access token'
-    print(SONOS_API.access_token)
 
     data, code = SONOS_API.get('households')
     if code < 200 or code > 300:
         return f'Error with getting household: {data}\nStatus Code: {code}'
 
     # Grab Household ID
-    print(data)
     household_id = data['households'][0]['id']
     os.environ['HouseholdID'] = household_id
 
@@ -43,7 +35,6 @@ def setup_flow():
     data, code = SONOS_API.get(f'households/{household_id}/groups')
     if code < 200 or code > 300:
         return f'Error with getting groups: {data}\nStatus Code: {code}'
-    print(data)
     
     for group in data['groups']:
         GROUP_IDS[group['name']] = group['id']
@@ -51,8 +42,6 @@ def setup_flow():
 
     # Get favorites
     data, code = SONOS_API.get(f'households/{household_id}/favorites')
-
-    print(f'Favorites: {data}')
     if code < 200 or code > 300:
         return f'Error with getting favorites: {data}\nStatus Code: {code}'
 
@@ -64,6 +53,7 @@ def setup_flow():
 
 @bp.route('/favorites')
 def get_favorites():
+    """ Gets and returns the favorites for the authorized Sonos household """
     try:
         household_id = os.getenv('HouseholdID')
     except KeyError:
@@ -78,24 +68,35 @@ def get_favorites():
 
         for item in data['items']:
             FAVORITES[item['name']] = item['id']
-        return 'Got the favorites!'
+        return {'message': 'Got the favorites!', 'data': data['items']}
 
 
 @bp.route('/enter/<string:group>', methods=['GET', 'POST'],
           defaults={ 'favorite': None})
 @bp.route('/enter/<string:group>/<string:favorite>', methods=['GET', 'POST'])
 def enter_flow(group, favorite):
-    """ Endpoint for when the user enters into the range of the speaker """
+    """ Endpoint for when the user enters into the range of the speaker.
+        
+        Resumes whatever is paused on the speakers if a favorite is not
+        specified or picks a random favorite to play. Otherwise, plays the
+        favorite for the group specified.
+
+        Args:
+            group: string representing the name of the group in the household
+
+            favorite: string representing the name of the favorite in the
+                      household
+    """
     fav_provided = True
     try: 
         household_id = os.getenv('HouseholdID')
         group_id = GROUP_IDS[group]
         
         if favorite is None:
-            favorite = 'New Shit'
+            favorite = random.choice(list(FAVORITES))
             fav_provided = False
-
-        favorite_id = FAVORITES[favorite]
+        else:
+            favorite_id = FAVORITES[favorite]
     except KeyError:
         return 'Need to setup the flow first!'
     else:
@@ -121,7 +122,12 @@ def enter_flow(group, favorite):
 
 @bp.route('/exit/<string:group>', methods=['GET', 'POST'])
 def exit_flow(group):
-    """ Endpoint for when the user exits the range of the speaker """
+    """ Endpoint for when the user exits the range of the speaker. Pauses
+        whatever is being played for the specified group.
+
+        Args:
+            group: string representing the name of the group in the household
+    """
     try: 
         group_id = GROUP_IDS[group]
     except KeyError:
@@ -138,6 +144,7 @@ def exit_flow(group):
 
 @bp.route('/refresh')
 def handle_refresh():
+    """ Refreshes the access token for the Sonos API """
     resp = SONOS_API.refresh_tokens()
 
     if resp:

@@ -23,6 +23,12 @@ TOKEN_LOCAL_REDIRECT_URI = parse.quote('http://localhost:5000/auth/token-redirec
 @bp.route('/login', defaults={'local': 0})
 @bp.route('/login/<int:local>', methods=['GET'])
 def authenticate(local):
+    """ Constructs the proper uri and redirects the client to the Sonos Login
+
+        Args:
+            local: int specifying whether the redirect should go to localhost
+                   or the deployed instance
+    """
     client_key = parse.quote(os.getenv("CLIENT_KEY"), safe='')
     state = os.getenv("STATE")
     redirect_uri = LOGIN_LOCAL_REDIRECT_URI if local else LOGIN_REDIRECT_URI
@@ -39,6 +45,14 @@ def authenticate(local):
 @bp.route('/login-redirect', defaults={'local': 0}, methods=['GET'])
 @bp.route('/login-redirect/<int:local>', methods=['GET'])
 def handle_login_redirect(local):
+    """ Handles the redirect after authorizing Sonos Flow and gets the access
+        token for API calls to Sonos. Sets the access token to an environment
+        variable for use later.
+
+        Args:
+            local: int specifying whether the redirect should go to localhost
+                   or the deployed instance 
+    """
     if STATE != request.args['state']:
         return 'Invalid Redirect... Wrong State'
 
