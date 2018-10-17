@@ -27,9 +27,6 @@ def create_app(test_config=None):
     # load env variables
     from dotenv import load_dotenv
     load_dotenv()
-    # from pathlib import Path  # python3 only
-    # env_path = Path('.') / 'vars.env'
-    # load_dotenv(dotenv_path=env_path)
     
     # a simple page that says hello
     @app.route('/')

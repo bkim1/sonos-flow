@@ -3,6 +3,7 @@
     "alias": "sonos-flow.now.sh",
     "env": {
         "CLIENT_KEY": "@flow-client-key",
-        "CLIENT_SECRET": "@flow-client-secret"
+        "CLIENT_SECRET": "@flow-client-secret",
+        "STATE": "flowState"
     }
 }
