@@ -2,7 +2,7 @@ import os
 import random
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, g, redirect, render_template, request, jsonify
 )
 
 from app.services.api_sonos import SonosAPI
@@ -48,7 +48,12 @@ def setup_flow():
     for item in data['items']:
         FAVORITES[item['name']] = item['id']
 
-    return 'Flow has been setup!'
+    return jsonify({
+        'message': 'Flow has been setup!',
+        'favorites': FAVORITES,
+        'groups': GROUP_IDS,
+        'players': PLAYER_IDS
+    })
 
 
 @bp.route('/favorites')
@@ -68,7 +73,7 @@ def get_favorites():
 
         for item in data['items']:
             FAVORITES[item['name']] = item['id']
-        return {'message': 'Got the favorites!', 'data': data['items']}
+        return jsonify({'message': 'Got the favorites!', 'data': data['items']})
 
 
 @bp.route('/enter/<string:group>', methods=['GET', 'POST'],
@@ -103,7 +108,7 @@ def enter_flow(group, favorite):
             # Attempt to play something already queued
             data, code = SONOS_API.post(f'groups/{group_id}/playback/play')
             if code >= 200 or code < 300:
-                return 'Entered flow!'
+                return jsonify({'message': 'Entered flow!', 'data': data})
 
         # Else, play favorites
         payload = {
@@ -116,7 +121,7 @@ def enter_flow(group, favorite):
 
         print(f'Data: {data}')
         print(f'Status Code: {code}')
-        return 'Entered flow!'
+        return jsonify({'message': 'Entered flow!', 'data': data})
 
 
 @bp.route('/exit/<string:group>', methods=['GET', 'POST'])
@@ -138,7 +143,28 @@ def exit_flow(group):
 
         print(f'Data: {data}')
         print(f'Status Code: {code}')
-        return 'Exited flow!'
+        return jsonify({'message': 'Exited flow!', 'data': data})
+
+
+@bp.route('/continue/<string:group_from>/<string:group_to>', methods=['GET'])
+def continue_flow(group_from, group_to):
+    pass
+
+
+@bp.route('/groups')
+def get_groups():
+    try:
+        household_id = os.getenv('HouseholdID')
+    except KeyError:
+        return 'Need to setup the flow first!'
+    else:
+        # Get groups & player IDs
+        data, code = SONOS_API.get(f'households/{household_id}/groups')
+        if code < 200 or code > 300:
+            return f'Error with getting groups: {data}\nStatus Code: {code}'
+        
+        print(f'Groups: {data}')
+        return jsonify({'data': data, 'message': 'Got the groups!'})
 
 
 @bp.route('/refresh')
