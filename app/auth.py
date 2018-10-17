@@ -16,8 +16,6 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 SONOS_AUTH_URL = 'https://api.sonos.com/login/v3/oauth'
 LOGIN_REDIRECT_URI = parse.quote('https://sonos-flow.now.sh/auth/login-redirect', safe='')
 LOGIN_LOCAL_REDIRECT_URI = parse.quote('http://localhost:5000/auth/login-redirect/1', safe='')
-TOKEN_REDIRECT_URI = parse.quote('https://sonos-flow.now.sh/auth/token-redirect', safe='')
-TOKEN_LOCAL_REDIRECT_URI = parse.quote('http://localhost:5000/auth/token-redirect', safe='')
 FLOW_SETUP_URI = 'https://sonos-flow.now.sh/flow'
 FLOW_SETUP_LOCAL_URI = 'http://localhost:5000/flow'
 
@@ -59,7 +57,6 @@ def handle_login_redirect(local):
         return 'Invalid Redirect... Wrong State'
 
     auth_code = request.args['code']
-    print(auth_code)
 
     client_key, secret_key = os.getenv('CLIENT_KEY'), os.getenv('CLIENT_SECRET')
 
@@ -82,8 +79,6 @@ def handle_login_redirect(local):
     # Make POST request for Access Token
     resp = requests.post(auth_url, data=payload, headers=headers)
     json_data = resp.json()
-    print(f'Data: {json_data}')
-    print(f'Status Code: {resp.status_code}')
 
     # Set tokens in environment variables for later access
     os.environ['AccessToken'] = json_data['access_token']

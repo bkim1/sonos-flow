@@ -15,7 +15,7 @@ PLAYER_IDS = {}
 FAVORITES = {}
 
 
-@bp.route('/')
+@bp.route('/', methods=['GET'])
 def setup_flow():
     """ Sets up the server to handle Flow control for the Sonos household
         authorized. Grabs the groups and favorites for the first household.
@@ -56,7 +56,7 @@ def setup_flow():
     })
 
 
-@bp.route('/favorites')
+@bp.route('/favorites', methods=['GET'])
 def get_favorites():
     """ Gets and returns the favorites for the authorized Sonos household """
     try:
@@ -66,8 +66,6 @@ def get_favorites():
     else:
         data, code = SONOS_API.get(f'households/{household_id}/favorites')
 
-        print(f'Data: {data}')
-        print(f'Status Code: {code}')
         if code < 200 or code > 300:
             return f'Error with getting favorites: {data}\nStatus Code: {code}'
 
@@ -76,9 +74,9 @@ def get_favorites():
         return jsonify({'message': 'Got the favorites!', 'data': data['items']})
 
 
-@bp.route('/enter/<string:group>', methods=['GET', 'POST'],
+@bp.route('/enter/<string:group>', methods=['GET'],
           defaults={ 'favorite': None})
-@bp.route('/enter/<string:group>/<string:favorite>', methods=['GET', 'POST'])
+@bp.route('/enter/<string:group>/<string:favorite>', methods=['GET'])
 def enter_flow(group, favorite):
     """ Endpoint for when the user enters into the range of the speaker.
         
@@ -119,12 +117,10 @@ def enter_flow(group, favorite):
         if code < 200 or code > 300:
             return f'Error with starting playback: {data}\nStatus Code: {code}'
 
-        print(f'Data: {data}')
-        print(f'Status Code: {code}')
         return jsonify({'message': 'Entered flow!', 'data': data})
 
 
-@bp.route('/exit/<string:group>', methods=['GET', 'POST'])
+@bp.route('/exit/<string:group>', methods=['GET'])
 def exit_flow(group):
     """ Endpoint for when the user exits the range of the speaker. Pauses
         whatever is being played for the specified group.
@@ -141,8 +137,6 @@ def exit_flow(group):
         if code < 200 or code > 300:
             return f'Error with pausing playback: {data}\nStatus Code: {code}'
 
-        print(f'Data: {data}')
-        print(f'Status Code: {code}')
         return jsonify({'message': 'Exited flow!', 'data': data})
 
 
@@ -151,7 +145,7 @@ def continue_flow(group_from, group_to):
     pass
 
 
-@bp.route('/groups')
+@bp.route('/groups', methods=['GET'])
 def get_groups():
     try:
         household_id = os.getenv('HouseholdID')
@@ -163,7 +157,6 @@ def get_groups():
         if code < 200 or code > 300:
             return f'Error with getting groups: {data}\nStatus Code: {code}'
         
-        print(f'Groups: {data}')
         return jsonify({'data': data, 'message': 'Got the groups!'})
 
 
