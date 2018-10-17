@@ -18,6 +18,8 @@ LOGIN_REDIRECT_URI = parse.quote('https://sonos-flow.now.sh/auth/login-redirect'
 LOGIN_LOCAL_REDIRECT_URI = parse.quote('http://localhost:5000/auth/login-redirect/1', safe='')
 TOKEN_REDIRECT_URI = parse.quote('https://sonos-flow.now.sh/auth/token-redirect', safe='')
 TOKEN_LOCAL_REDIRECT_URI = parse.quote('http://localhost:5000/auth/token-redirect', safe='')
+FLOW_SETUP_URI = 'https://sonos-flow.now.sh/flow'
+FLOW_SETUP_LOCAL_URI = 'http://localhost:5000/flow'
 
 
 @bp.route('/login', defaults={'local': 0})
@@ -88,5 +90,7 @@ def handle_login_redirect(local):
     os.environ['RefreshToken'] = json_data['refresh_token']
     os.environ['TokenCreated'] = str(time.time())
     os.environ['ExpiresIn'] = str(json_data['expires_in'])
+
+    flow_setup_redirect = FLOW_SETUP_LOCAL_URI if local else FLOW_SETUP_URI
     
-    return 'Received Login Redirect!'
+    return redirect(flow_setup_redirect)
