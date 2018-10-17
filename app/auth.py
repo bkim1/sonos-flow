@@ -1,6 +1,7 @@
 from urllib import parse
 import os
 import base64
+import time
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
@@ -59,11 +60,7 @@ def handle_login_redirect(local):
 
     # Set Headers & Data for request
     auth_url = f'{SONOS_AUTH_URL}/access'
-    headers = {
-        "Authorization": 'Basic %s' % encoded_keys_str,
-        # 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
-    }
-    print(headers)
+    headers = { 'Authorization': 'Basic %s' % encoded_keys_str, }
     payload = {
         'grant_type': 'authorization_code',
         'code': auth_code,
@@ -72,6 +69,14 @@ def handle_login_redirect(local):
 
     # Make POST request for Access Token
     resp = requests.post(auth_url, data=payload, headers=headers)
-    print(f'Data: {resp.json()}')
+    json_data = resp.json()
+    print(f'Data: {json_data}')
     print(f'Status Code: {resp.status_code}')
+
+    # Set tokens in environment variables for later access
+    os.environ['AccessToken'] = json_data['access_token']
+    os.environ['RefreshToken'] = json_data['refresh_token']
+    os.environ['TokenCreated'] = str(time.time())
+    os.environ['ExpiresIn'] = str(json_data['expires_in'])
+    
     return 'Received Login Redirect!'
