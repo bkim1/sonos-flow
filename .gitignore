@@ -24,4 +24,5 @@ build/
 vars.env
 .env
 
-
+# 'database' stuff
+app/db/*.txt
